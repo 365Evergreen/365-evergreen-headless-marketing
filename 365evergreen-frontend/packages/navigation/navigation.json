@@ -1,0 +1,37 @@
+{
+  "global": [
+    { "label": "Home", "href": "/" }
+  ],
+  "marketing": [
+    {
+      "label": "What we do",
+      "groups": [
+        {
+          "title": "Group 1",
+          "items": [
+            { "label": "Modern workplace", "href": "/parent-1" }, 
+            { "label": "Process automation", "href": "/parent-2" },
+            { "label": "Business apps", "href": "/parent-3" }, 
+            { "label": "Artificial intelligence", "href": "/parent-4" }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "Why 365 Evergreen",
+      "groups": [
+        {
+          "title": "Group 2",
+          "items": [
+            { "label": "Customer stories", "href": "/parent-5" }, 
+            { "label": "Partner stories", "href": "/parent-6" }
+          ]
+        }
+      ]
+    }
+  ],
+  "content": {
+    "categories": [],
+    "featured": []
+  }
+}

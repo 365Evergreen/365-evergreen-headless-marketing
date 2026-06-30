@@ -1,0 +1,43 @@
+{
+  "name": "@evergreen/ui",
+  "version": "1.0.0",
+  "description": "Shared UI components for 365 Evergreen frontend apps",
+  "private": true,
+  "packageManager": "pnpm@9.15.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./site-header": {
+      "types": "./dist/SiteHeader/index.d.ts",
+      "import": "./dist/SiteHeader/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc && node scripts/copy-css.mjs",
+    "clean": "rimraf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "cpy": "^13.2.2",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "rimraf": "^5.0.0",
+    "typescript": "^5.4.0"
+  }
+}

@@ -1,0 +1,10 @@
+.siteShell {
+  min-height: 100vh;
+  padding-block-start: var(--site-header-height, 82px);
+}
+
+@media (max-width: 920px) {
+  .siteShell {
+    padding-block-start: var(--site-header-height-mobile, 70px);
+  }
+}

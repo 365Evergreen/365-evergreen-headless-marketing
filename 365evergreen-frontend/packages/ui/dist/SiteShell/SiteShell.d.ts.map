@@ -1,0 +1,1 @@
+{"version":3,"file":"SiteShell.d.ts","sourceRoot":"","sources":["../../src/SiteShell/SiteShell.tsx"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,SAAS,EAAE,MAAM,OAAO,CAAC;AAGvC,MAAM,MAAM,cAAc,GAAG;IAC3B,QAAQ,EAAE,SAAS,CAAC;CACrB,CAAC;AAEF,wBAAgB,SAAS,CAAC,EAAE,QAAQ,EAAE,EAAE,cAAc,+BAErD"}

@@ -1,0 +1,43 @@
+{
+  "compilerOptions": {
+    /* ✅ Language + runtime */
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+
+    /* ✅ Strictness */
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+
+    /* ✅ JSX (React-compatible for shared UI) */
+    "jsx": "react-jsx",
+
+    /* ✅ Module behaviour */
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+
+    /* ✅ Monorepo support */
+    "baseUrl": ".",
+    "paths": {
+      "@evergreen/ui": ["packages/ui/src"],
+      "@evergreen/ui/*": ["packages/ui/src/*"],
+      "@evergreen/designTokens": ["packages/design-tokens/src"],
+      "@evergreen/designTokens/*": ["packages/design-tokens/src/*"],
+      "@evergreen/navigation": ["packages/navigation/src"],
+      "@evergreen/navigation/*": ["packages/navigation/src/*"]
+    },
+
+    /* ✅ Output control (overridden per package) */
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+
+    /* ✅ Build behaviour */
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  }
+}
