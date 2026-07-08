@@ -1,42 +1,29 @@
 import { useEffect, useMemo, useState } from "react";
 import styles from "./SiteHeader.module.css";
 
-export type NavItem = {
+type NavItem = {
   label: string;
   href: string;
-  description?: string;
 };
 
-export type NavGroup = {
+type NavGroup = {
   title: string;
   items: NavItem[];
 };
 
-export type MegaMenuItem = {
+type MegaMenuItem = {
   label: string;
   href?: string;
   groups: NavGroup[];
 };
 
-export type NavigationSchema = {
+type NavigationSchema = {
   global: NavItem[];
   marketing: MegaMenuItem[];
   content: {
     categories: NavItem[];
     featured: NavItem[];
   };
-};
-
-export type SiteHeaderVariant = "marketing" | "content";
-
-export type SiteHeaderProps = {
-  navUrl: string;
-  variant?: SiteHeaderVariant;
-  logoSrc?: string;
-  logoAlt?: string;
-  brandLabel?: string;
-  ctaLabel?: string;
-  ctaHref?: string;
 };
 
 type HeaderNavItem =
@@ -52,81 +39,57 @@ type HeaderNavItem =
       groups: NavGroup[];
     };
 
+export type SiteHeaderProps = {
+  navUrl: string;
+  variant?: "marketing" | "content";
+  logoSrc?: string;
+  brandLabel?: string;
+};
+
 export function SiteHeader({
   navUrl,
   variant = "marketing",
-  logoSrc = "https://365evergreendev.com/wp-content/uploads/2026/06/Evergreen_Logo__100px.png",
-  logoAlt = "365 Evergreen logo",
-  brandLabel = "365 Evergreen",
-  ctaLabel,
-  ctaHref
+  logoSrc = "https://sa365evergreenwebsite.blob.core.windows.net/media/home/365-evergreen-logo.svg",
+  brandLabel = "365 Evergreen"
 }: SiteHeaderProps) {
   const [navigation, setNavigation] = useState<NavigationSchema | null>(null);
-  const [hasScrolled, setHasScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
 
+  // ✅ Fetch navigation
   useEffect(() => {
-    let isMounted = true;
-
-    async function loadNavigation() {
+    async function loadNav() {
       try {
-        const response = await fetch(navUrl, {
-          headers: {
-            Accept: "application/json"
-          }
-        });
+        const res = await fetch(navUrl);
 
-        if (!response.ok) {
-          throw new Error(`Navigation request failed: ${response.status}`);
-        }
+        if (!res.ok) throw new Error();
 
-        const data = (await response.json()) as NavigationSchema;
-
-        if (isMounted) {
-          setNavigation(data);
-          setLoadError(null);
-        }
-      } catch (error) {
-        if (isMounted) {
-          setLoadError(error instanceof Error ? error.message : "Navigation failed to load");
-        }
+        const data = await res.json();
+        setNavigation(data);
+      } catch {
+        console.error("Failed to load navigation");
       }
     }
 
-    loadNavigation();
-
-    return () => {
-      isMounted = false;
-    };
+    loadNav();
   }, [navUrl]);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setHasScrolled(window.scrollY > 12);
+    const updateScrollState = () => {
+      setIsScrolled(window.scrollY > 0);
     };
 
-    handleScroll();
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    updateScrollState();
+    window.addEventListener("scroll", updateScrollState, { passive: true });
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("scroll", updateScrollState);
     };
   }, []);
 
-  useEffect(() => {
-    document.body.style.overflow = isMenuOpen ? "hidden" : "";
-
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isMenuOpen]);
-
+  // ✅ Map navigation safely
   const navItems = useMemo<HeaderNavItem[]>(() => {
-    if (!navigation) {
-      return [];
-    }
+    if (!navigation) return [];
 
     const globalItems: HeaderNavItem[] = navigation.global.map((item) => ({
       type: "link",
@@ -134,185 +97,134 @@ export function SiteHeader({
       href: item.href
     }));
 
+    // ✅ Marketing = full nav
     if (variant === "marketing") {
-      const marketingItems: HeaderNavItem[] = navigation.marketing.map((item) => ({
-        type: "mega",
-        label: item.label,
-        href: item.href,
-        groups: item.groups
-      }));
-
-      return [...globalItems, ...marketingItems];
+      return [
+        ...globalItems,
+        ...navigation.marketing.map((item) => ({
+          type: "mega" as const,
+          label: item.label,
+          href: item.href,
+          groups: item.groups
+        }))
+      ];
     }
 
-    const contentCategoryItems = navigation.content.categories;
+    // ✅ ✅ Content = fallback to marketing nav if no categories
+    if (variant === "content") {
+      if (navigation.content?.categories?.length > 0) {
+        return [
+          ...globalItems,
+          {
+            type: "mega" as const,
+            label: "Topics",
+            href: "/topics",
+            groups: [
+              {
+                title: "Categories",
+                items: navigation.content.categories
+              }
+            ]
+          }
+        ];
+      }
 
-    const contentItems: HeaderNavItem[] =
-      contentCategoryItems.length > 0
-        ? [
-            {
-              type: "mega",
-              label: "Topics",
-              groups: [
-                {
-                  title: "Categories",
-                  items: contentCategoryItems
-                }
-              ]
-            }
-          ]
-        : [];
+      // ✅ fallback so nav always renders
+      return [
+        ...globalItems,
+        ...navigation.marketing.map((item) => ({
+          type: "mega" as const,
+          label: item.label,
+          href: item.href,
+          groups: item.groups
+        }))
+      ];
+    }
 
-    return [...globalItems, ...contentItems];
+    return globalItems;
   }, [navigation, variant]);
 
-  const headerClassName = [
-    styles.siteHeader,
-    hasScrolled ? styles.siteHeaderScrolled : "",
-    isMenuOpen ? styles.siteHeaderMenuOpen : ""
-  ]
-    .filter(Boolean)
-    .join(" ");
-
   return (
-    <header className={headerClassName}>
-      <div className={styles.headerInner}>
-        <a className={styles.brand} href="/" aria-label={brandLabel}>
-          <img className={styles.logo} src={logoSrc} alt={logoAlt} />
-          <span className={styles.brandText}>{brandLabel}</span>
+    <header className={`${styles.header} ${isScrolled ? styles.scrolled : ""}`}>
+      <div className={styles.inner}>
+        {/* Logo */}
+        <a href="/" className={styles.brand}>
+          <img src={logoSrc} alt={brandLabel} className={styles.logo} />
+          <span>{brandLabel}</span>
         </a>
 
-        <nav className={styles.desktopNav} aria-label="Primary navigation">
-          <ul className={styles.desktopNavList}>
-            {navItems.map((item) => (
-              <li key={item.label} className={styles.desktopNavItem}>
-                {item.type === "link" ? (
-                  <a className={styles.desktopNavLink} href={item.href}>
-                    {item.label}
-                  </a>
-                ) : (
-                  <>
-                    <a className={styles.desktopNavLink} href={item.href ?? "#"}>
-                      {item.label}
-                    </a>
+        {/* Desktop nav */}
+        <nav className={styles.desktopNav}>
+          {navItems.map((item) => (
+            <div key={item.label} className={styles.navItem}>
+              {item.type === "link" ? (
+                <a href={item.href} className={styles.link}>
+                  {item.label}
+                </a>
+              ) : (
+                <div className={styles.megaWrapper}>
+                  <span className={styles.link}>{item.label}</span>
 
-                    <div className={styles.megaMenu}>
-                      <div className={styles.megaMenuPanel}>
-                        {item.groups.map((group) => (
-                          <section key={group.title} className={styles.megaMenuGroup}>
-                            <h2 className={styles.megaMenuTitle}>{group.title}</h2>
+                  <div className={styles.megaMenu}>
+                    {item.groups.map((group) => (
+                      <div key={group.title}>
+                        <div className={styles.groupTitle}>
+                          {group.title}
+                        </div>
 
-                            <ul className={styles.megaMenuList}>
-                              {group.items.map((groupItem) => (
-                                <li key={groupItem.href}>
-                                  <a className={styles.megaMenuLink} href={groupItem.href}>
-                                    <span className={styles.megaMenuLinkLabel}>
-                                      {groupItem.label}
-                                    </span>
-
-                                    {groupItem.description && (
-                                      <span className={styles.megaMenuLinkDescription}>
-                                        {groupItem.description}
-                                      </span>
-                                    )}
-                                  </a>
-                                </li>
-                              ))}
-                            </ul>
-                          </section>
+                        {group.items.map((sub) => (
+                          <a key={sub.href} href={sub.href} className={styles.link}>
+                            {sub.label}
+                          </a>
                         ))}
                       </div>
-                    </div>
-                  </>
-                )}
-              </li>
-            ))}
-          </ul>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
         </nav>
 
-        {ctaLabel && ctaHref && (
-          <a className={styles.desktopCta} href={ctaHref}>
-            {ctaLabel}
-          </a>
-        )}
-
+        {/* Mobile toggle */}
         <button
-          type="button"
-          className={styles.menuButton}
-          aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
-          aria-expanded={isMenuOpen}
-          aria-controls="mobile-navigation"
-          onClick={() => setIsMenuOpen((current) => !current)}
+          className={styles.menuToggle}
+          onClick={() => setIsMenuOpen((prev) => !prev)}
         >
-          <span className={styles.menuButtonLine} />
-          <span className={styles.menuButtonLine} />
-          <span className={styles.menuButtonLine} />
+          ☰
         </button>
       </div>
 
-      <nav
-        id="mobile-navigation"
-        className={styles.mobileNav}
-        aria-label="Mobile navigation"
-      >
-        <ul className={styles.mobileNavList}>
+      {/* Mobile nav */}
+      {isMenuOpen && (
+        <nav className={styles.mobileNav}>
           {navItems.map((item) => (
-            <li key={item.label} className={styles.mobileNavItem}>
+            <div key={item.label}>
               {item.type === "link" ? (
-                <a
-                  className={styles.mobileNavLink}
-                  href={item.href}
-                  onClick={() => setIsMenuOpen(false)}
-                >
+                <a href={item.href} className={styles.mobileLink}>
                   {item.label}
                 </a>
               ) : (
                 <>
-                  <span className={styles.mobileNavHeading}>{item.label}</span>
+                  <div className={styles.mobileHeading}>{item.label}</div>
 
-                  {item.groups.map((group) => (
-                    <div key={group.title} className={styles.mobileNavGroup}>
-                      <span className={styles.mobileNavGroupTitle}>{group.title}</span>
-
-                      <ul className={styles.mobileChildList}>
-                        {group.items.map((groupItem) => (
-                          <li key={groupItem.href}>
-                            <a
-                              className={styles.mobileChildLink}
-                              href={groupItem.href}
-                              onClick={() => setIsMenuOpen(false)}
-                            >
-                              {groupItem.label}
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
+                  {item.groups.map((group) =>
+                    group.items.map((sub) => (
+                      <a
+                        key={sub.href}
+                        href={sub.href}
+                        className={styles.mobileLink}
+                      >
+                        {sub.label}
+                      </a>
+                    ))
+                  )}
                 </>
               )}
-            </li>
+            </div>
           ))}
-
-          {ctaLabel && ctaHref && (
-            <li className={styles.mobileNavItem}>
-              <a
-                className={styles.mobileCta}
-                href={ctaHref}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {ctaLabel}
-              </a>
-            </li>
-          )}
-        </ul>
-
-        {loadError && (
-          <p className={styles.navError} role="status">
-            Navigation unavailable
-          </p>
-        )}
-      </nav>
+        </nav>
+      )}
     </header>
   );
 }

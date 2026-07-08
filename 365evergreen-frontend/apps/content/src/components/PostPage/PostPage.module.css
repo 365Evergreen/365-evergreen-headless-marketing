@@ -1,0 +1,145 @@
+.article {
+  display: grid;
+  gap: 1.5rem;
+
+  text-align: left;
+  /* ✅ ensures inheritance is correct */
+}
+
+.title {
+  font-size: var(--font-size-xxl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-tight);
+}
+
+.image {
+  width: 100%;
+  border-radius: 14px;
+  object-fit: cover;
+}
+
+.content {
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-relaxed);
+}
+
+.content {
+  text-align: left;
+  /* ✅ CRITICAL FIX */
+  margin-inline: 0;
+  /* ✅ remove any centring */
+
+  width: 100%;
+  max-width: none;
+  /* ✅ critical */
+  text-align: left;
+}
+
+/* Main content container */
+.content {
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-relaxed);
+  width: 100%;
+  max-width: none;
+  text-align: left;
+  background: white;
+}
+
+/* Gutenberg block spacing */
+.content [class*="wp-block-"] {
+  margin-bottom: 1.5rem;
+}
+
+/* Headings */
+
+.content h1 {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  margin-top: 2rem;
+}
+
+.content h2 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  margin-top: 2rem;
+}
+
+.content h3 {
+  font-size: 1.2rem;
+  font-weight: var(--font-weight-semibold);
+  margin-top: 1.5rem;
+}
+
+/* Paragraphs */
+
+.content p {
+  margin: 1rem 0;
+}
+
+/* Lists */
+
+.content ul,
+.content ol {
+  margin: 1rem 0;
+  padding-left: 1.4rem;
+}
+
+.content li {
+  margin-bottom: 0.4rem;
+}
+
+/* Images */
+
+.content img {
+  max-width: 100%;
+  border-radius: 12px;
+  margin: 1.5rem 0;
+}
+
+/* Links */
+
+.content a {
+  color: var(--color-brand-primary);
+  text-decoration: underline;
+}
+
+/* Tables */
+
+.content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+}
+
+.content th,
+.content td {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  padding: 0.6rem;
+}
+
+/* Block quotes */
+
+.content blockquote {
+  border-left: 4px solid var(--color-brand-primary);
+  padding-left: 1rem;
+  margin: 1.5rem 0;
+  color: var(--color-text-muted);
+}
+
+/* Horizontal rules */
+
+.content hr {
+  border: none;
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+  margin: 2rem 0;
+}
+
+
+.state {
+  color: var(--color-text-muted);
+}
+
+.error {
+  color: #b91c1c;
+}

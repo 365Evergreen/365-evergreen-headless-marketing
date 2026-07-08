@@ -1,97 +1,87 @@
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 import { useEffect, useMemo, useState } from "react";
 import styles from "./SiteHeader.module.css";
-export function SiteHeader({ navUrl, variant = "marketing", logoSrc = "https://365evergreendev.com/wp-content/uploads/2026/06/Evergreen_Logo__100px.png", logoAlt = "365 Evergreen logo", brandLabel = "365 Evergreen", ctaLabel, ctaHref }) {
+export function SiteHeader({ navUrl, variant = "marketing", logoSrc = "https://sa365evergreenwebsite.blob.core.windows.net/media/home/365-evergreen-logo.svg", brandLabel = "365 Evergreen" }) {
     const [navigation, setNavigation] = useState(null);
-    const [hasScrolled, setHasScrolled] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [loadError, setLoadError] = useState(null);
+    const [isScrolled, setIsScrolled] = useState(false);
+    // ✅ Fetch navigation
     useEffect(() => {
-        let isMounted = true;
-        async function loadNavigation() {
+        async function loadNav() {
             try {
-                const response = await fetch(navUrl, {
-                    headers: {
-                        Accept: "application/json"
-                    }
-                });
-                if (!response.ok) {
-                    throw new Error(`Navigation request failed: ${response.status}`);
-                }
-                const data = (await response.json());
-                if (isMounted) {
-                    setNavigation(data);
-                    setLoadError(null);
-                }
+                const res = await fetch(navUrl);
+                if (!res.ok)
+                    throw new Error();
+                const data = await res.json();
+                setNavigation(data);
             }
-            catch (error) {
-                if (isMounted) {
-                    setLoadError(error instanceof Error ? error.message : "Navigation failed to load");
-                }
+            catch {
+                console.error("Failed to load navigation");
             }
         }
-        loadNavigation();
-        return () => {
-            isMounted = false;
-        };
+        loadNav();
     }, [navUrl]);
     useEffect(() => {
-        const handleScroll = () => {
-            setHasScrolled(window.scrollY > 12);
+        const updateScrollState = () => {
+            setIsScrolled(window.scrollY > 0);
         };
-        handleScroll();
-        window.addEventListener("scroll", handleScroll, { passive: true });
+        updateScrollState();
+        window.addEventListener("scroll", updateScrollState, { passive: true });
         return () => {
-            window.removeEventListener("scroll", handleScroll);
+            window.removeEventListener("scroll", updateScrollState);
         };
     }, []);
-    useEffect(() => {
-        document.body.style.overflow = isMenuOpen ? "hidden" : "";
-        return () => {
-            document.body.style.overflow = "";
-        };
-    }, [isMenuOpen]);
+    // ✅ Map navigation safely
     const navItems = useMemo(() => {
-        if (!navigation) {
+        if (!navigation)
             return [];
-        }
         const globalItems = navigation.global.map((item) => ({
             type: "link",
             label: item.label,
             href: item.href
         }));
+        // ✅ Marketing = full nav
         if (variant === "marketing") {
-            const marketingItems = navigation.marketing.map((item) => ({
-                type: "mega",
-                label: item.label,
-                href: item.href,
-                groups: item.groups
-            }));
-            return [...globalItems, ...marketingItems];
-        }
-        const contentCategoryItems = navigation.content.categories;
-        const contentItems = contentCategoryItems.length > 0
-            ? [
-                {
+            return [
+                ...globalItems,
+                ...navigation.marketing.map((item) => ({
                     type: "mega",
-                    label: "Topics",
-                    groups: [
-                        {
-                            title: "Categories",
-                            items: contentCategoryItems
-                        }
-                    ]
-                }
-            ]
-            : [];
-        return [...globalItems, ...contentItems];
+                    label: item.label,
+                    href: item.href,
+                    groups: item.groups
+                }))
+            ];
+        }
+        // ✅ ✅ Content = fallback to marketing nav if no categories
+        if (variant === "content") {
+            if (navigation.content?.categories?.length > 0) {
+                return [
+                    ...globalItems,
+                    {
+                        type: "mega",
+                        label: "Topics",
+                        href: "/topics",
+                        groups: [
+                            {
+                                title: "Categories",
+                                items: navigation.content.categories
+                            }
+                        ]
+                    }
+                ];
+            }
+            // ✅ fallback so nav always renders
+            return [
+                ...globalItems,
+                ...navigation.marketing.map((item) => ({
+                    type: "mega",
+                    label: item.label,
+                    href: item.href,
+                    groups: item.groups
+                }))
+            ];
+        }
+        return globalItems;
     }, [navigation, variant]);
-    const headerClassName = [
-        styles.siteHeader,
-        hasScrolled ? styles.siteHeaderScrolled : "",
-        isMenuOpen ? styles.siteHeaderMenuOpen : ""
-    ]
-        .filter(Boolean)
-        .join(" ");
-    return (_jsxs("header", { className: headerClassName, children: [_jsxs("div", { className: styles.headerInner, children: [_jsxs("a", { className: styles.brand, href: "/", "aria-label": brandLabel, children: [_jsx("img", { className: styles.logo, src: logoSrc, alt: logoAlt }), _jsx("span", { className: styles.brandText, children: brandLabel })] }), _jsx("nav", { className: styles.desktopNav, "aria-label": "Primary navigation", children: _jsx("ul", { className: styles.desktopNavList, children: navItems.map((item) => (_jsx("li", { className: styles.desktopNavItem, children: item.type === "link" ? (_jsx("a", { className: styles.desktopNavLink, href: item.href, children: item.label })) : (_jsxs(_Fragment, { children: [_jsx("a", { className: styles.desktopNavLink, href: item.href ?? "#", children: item.label }), _jsx("div", { className: styles.megaMenu, children: _jsx("div", { className: styles.megaMenuPanel, children: item.groups.map((group) => (_jsxs("section", { className: styles.megaMenuGroup, children: [_jsx("h2", { className: styles.megaMenuTitle, children: group.title }), _jsx("ul", { className: styles.megaMenuList, children: group.items.map((groupItem) => (_jsx("li", { children: _jsxs("a", { className: styles.megaMenuLink, href: groupItem.href, children: [_jsx("span", { className: styles.megaMenuLinkLabel, children: groupItem.label }), groupItem.description && (_jsx("span", { className: styles.megaMenuLinkDescription, children: groupItem.description }))] }) }, groupItem.href))) })] }, group.title))) }) })] })) }, item.label))) }) }), ctaLabel && ctaHref && (_jsx("a", { className: styles.desktopCta, href: ctaHref, children: ctaLabel })), _jsxs("button", { type: "button", className: styles.menuButton, "aria-label": isMenuOpen ? "Close navigation menu" : "Open navigation menu", "aria-expanded": isMenuOpen, "aria-controls": "mobile-navigation", onClick: () => setIsMenuOpen((current) => !current), children: [_jsx("span", { className: styles.menuButtonLine }), _jsx("span", { className: styles.menuButtonLine }), _jsx("span", { className: styles.menuButtonLine })] })] }), _jsxs("nav", { id: "mobile-navigation", className: styles.mobileNav, "aria-label": "Mobile navigation", children: [_jsxs("ul", { className: styles.mobileNavList, children: [navItems.map((item) => (_jsx("li", { className: styles.mobileNavItem, children: item.type === "link" ? (_jsx("a", { className: styles.mobileNavLink, href: item.href, onClick: () => setIsMenuOpen(false), children: item.label })) : (_jsxs(_Fragment, { children: [_jsx("span", { className: styles.mobileNavHeading, children: item.label }), item.groups.map((group) => (_jsxs("div", { className: styles.mobileNavGroup, children: [_jsx("span", { className: styles.mobileNavGroupTitle, children: group.title }), _jsx("ul", { className: styles.mobileChildList, children: group.items.map((groupItem) => (_jsx("li", { children: _jsx("a", { className: styles.mobileChildLink, href: groupItem.href, onClick: () => setIsMenuOpen(false), children: groupItem.label }) }, groupItem.href))) })] }, group.title)))] })) }, item.label))), ctaLabel && ctaHref && (_jsx("li", { className: styles.mobileNavItem, children: _jsx("a", { className: styles.mobileCta, href: ctaHref, onClick: () => setIsMenuOpen(false), children: ctaLabel }) }))] }), loadError && (_jsx("p", { className: styles.navError, role: "status", children: "Navigation unavailable" }))] })] }));
+    return (_jsxs("header", { className: `${styles.header} ${isScrolled ? styles.scrolled : ""}`, children: [_jsxs("div", { className: styles.inner, children: [_jsxs("a", { href: "/", className: styles.brand, children: [_jsx("img", { src: logoSrc, alt: brandLabel, className: styles.logo }), _jsx("span", { children: brandLabel })] }), _jsx("nav", { className: styles.desktopNav, children: navItems.map((item) => (_jsx("div", { className: styles.navItem, children: item.type === "link" ? (_jsx("a", { href: item.href, className: styles.link, children: item.label })) : (_jsxs("div", { className: styles.megaWrapper, children: [_jsx("span", { className: styles.link, children: item.label }), _jsx("div", { className: styles.megaMenu, children: item.groups.map((group) => (_jsxs("div", { children: [_jsx("div", { className: styles.groupTitle, children: group.title }), group.items.map((sub) => (_jsx("a", { href: sub.href, className: styles.link, children: sub.label }, sub.href)))] }, group.title))) })] })) }, item.label))) }), _jsx("button", { className: styles.menuToggle, onClick: () => setIsMenuOpen((prev) => !prev), children: "\u2630" })] }), isMenuOpen && (_jsx("nav", { className: styles.mobileNav, children: navItems.map((item) => (_jsx("div", { children: item.type === "link" ? (_jsx("a", { href: item.href, className: styles.mobileLink, children: item.label })) : (_jsxs(_Fragment, { children: [_jsx("div", { className: styles.mobileHeading, children: item.label }), item.groups.map((group) => group.items.map((sub) => (_jsx("a", { href: sub.href, className: styles.mobileLink, children: sub.label }, sub.href))))] })) }, item.label))) }))] }));
 }

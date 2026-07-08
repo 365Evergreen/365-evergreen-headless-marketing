@@ -1,0 +1,105 @@
+.grid {
+  display: grid;
+  gap: clamp(1.5rem, 3vw, 2rem);
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+.state {
+  font-size: var(--font-size-md);
+  color: var(--color-text-muted);
+}
+
+.stateError {
+  font-size: var(--font-size-md);
+  color: #b91c1c;
+}
+.content {
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-relaxed);
+  max-width: 720px;
+}
+
+/* Headings */
+
+.content h1 {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  margin-top: 2rem;
+}
+
+.content h2 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  margin-top: 2rem;
+}
+
+.content h3 {
+  font-size: 1.2rem;
+  font-weight: var(--font-weight-semibold);
+  margin-top: 1.5rem;
+}
+
+/* Paragraphs */
+
+.content p {
+  margin: 1rem 0;
+}
+
+/* Lists */
+
+.content ul,
+.content ol {
+  margin: 1rem 0;
+  padding-left: 1.4rem;
+}
+
+.content li {
+  margin-bottom: 0.4rem;
+}
+
+/* Images */
+
+.content img {
+  max-width: 100%;
+  border-radius: 12px;
+  margin: 1.5rem 0;
+}
+
+/* Links */
+
+.content a {
+  color: var(--color-brand-primary);
+  text-decoration: underline;
+}
+
+/* Tables */
+
+.content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+}
+
+.content th,
+.content td {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  padding: 0.6rem;
+  text-align: left;
+}
+
+/* Quotes */
+
+.content blockquote {
+  border-left: 4px solid var(--color-brand-primary);
+  padding-left: 1rem;
+  margin: 1.5rem 0;
+  color: var(--color-text-muted);
+}
+
+/* Horizontal rules */
+
+.content hr {
+  border: none;
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+  margin: 2rem 0;
+}
