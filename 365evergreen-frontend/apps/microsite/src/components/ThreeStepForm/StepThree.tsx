@@ -35,14 +35,16 @@ export default function StepThree({ state, dispatch }: StepProps) {
       ))}
 
       <label>How important is it to improve your digital workplace?</label>
-      <input
-        type="range"
-        min="0"
-        max="10"
-        value={state.importance || 5}
+     <select
+        value={state.importance || 3}
         onChange={(e) => dispatch({ type: "importance", payload: Number(e.target.value) })}
-      />
-      <span>{state.importance || 5}</span>
+      >
+        <option value="5">Very important</option>
+        <option value="4">Somewhat important</option>
+        <option value="3">Neutral</option>
+        <option value="2">Somewhat unimportant</option>
+        <option value="1">Not important</option>
+      </select>
 
       <label>What outcomes would you love to see?</label>
       {["Saving time", "Reducing frustration", "Improving teamwork", "Making processes simpler", "Helping people feel more connected", "Supporting growth and innovation"].map((opt) => (

@@ -5,6 +5,7 @@
   max-width: 700px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.1);
   font-weight: 400;
+  --button-background: #4f7f2a;
 }
 
 .progress {
@@ -27,6 +28,34 @@
 
 .container h2 {
   margin-top: 0;
+}
+
+
+.firstSectionGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.firstSectionFullWidth {
+  grid-column: 1 / -1;
+}
+
+.container input[type="text"] {
+  width: 100%;
+  box-sizing: border-box;
+  background: #fff;
+  padding-left: 12px;
+  padding-right: 12px;
+  border-radius: 6px;
+  border: 1px solid darkgrey;
 }
 
 .container textarea {
@@ -63,7 +92,7 @@
 
 button {
   padding: 10px 20px;
-  background: var(--color-brand-primary), #4f7f2a;
+  background: var(--button-background);
   color: #fff;
   border: none;
   border-radius: 6px;
@@ -72,5 +101,26 @@ button {
 }
 
 button:disabled {
-  background: #ccc;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.container select {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid darkgrey;
+  background: #fff;
+  color: #000;
+  font-size: 14px;
+}
+
+@media (max-width: 720px) {
+  .firstSectionGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .firstSectionFullWidth {
+    grid-column: auto;
+  }
 }
